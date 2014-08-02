@@ -9,5 +9,6 @@ Pod::Spec.new do |s|
   s.source       	= { :git => "https://github.com/hons82/RHPreferences.git", :tag => "v#{s.version}" }
   s.platform     	= :osx, '10.6'
   s.requires_arc 	= true
-  s.source_files 	= 'RHPreferences/*.{h,m,xib}'
+  s.source_files 	= 'RHPreferences/*.{h,m}'
+  s.resources 	 	= ["RHPreferences/*.xib"]
 end
