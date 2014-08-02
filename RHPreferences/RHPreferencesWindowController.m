@@ -38,18 +38,18 @@ static const CGFloat RHPreferencesWindowControllerResizeAnimationDurationPer100P
     NSString *_identifier;
 }
 +(id)controllerWithIdentifier:(NSString*)identifier;
-@property (readwrite, nonatomic, retain) NSString *identifier;
+@property (readwrite, nonatomic, strong) NSString *identifier;
 @end
 
 @implementation RHPreferencesCustomPlaceholderController
 @synthesize identifier=_identifier;
 +(id)controllerWithIdentifier:(NSString*)identifier{
-    RHPreferencesCustomPlaceholderController * placeholder = [[[RHPreferencesCustomPlaceholderController alloc] init] autorelease];
+    RHPreferencesCustomPlaceholderController * placeholder = [[RHPreferencesCustomPlaceholderController alloc] init];
     placeholder.identifier = identifier;
     return placeholder;
 }
 -(NSToolbarItem*)toolbarItem{
-    NSToolbarItem *item = [[[NSToolbarItem alloc] initWithItemIdentifier:_identifier] autorelease];
+    NSToolbarItem *item = [[NSToolbarItem alloc] initWithItemIdentifier:_identifier];
     return item;
 }
 -(NSString*)identifier{
@@ -116,21 +116,19 @@ static const CGFloat RHPreferencesWindowControllerResizeAnimationDurationPer100P
     if ([self isWindowLoaded]){
         self.window.title = windowTitle;
     } else {
-        [_unloadedWindowTitle release];
         _unloadedWindowTitle = [windowTitle copy];
     }
 }
 
 -(NSArray*)viewControllers{
-    return [[_viewControllers retain] autorelease];
+    return _viewControllers;
 }
 
 -(void)setViewControllers:(NSArray *)viewControllers{
     if (_viewControllers != viewControllers){
         NSUInteger oldSelectedIndex = [self selectedIndex];
         
-        [_viewControllers autorelease];
-        _viewControllers = [viewControllers retain];
+        _viewControllers = viewControllers;
         
         //update the selected controller if we had one previously.
         if (_selectedViewController){
@@ -157,7 +155,7 @@ static const CGFloat RHPreferencesWindowControllerResizeAnimationDurationPer100P
 }
 
 -(NSViewController<RHPreferencesViewControllerProtocol>*)selectedViewController{
-    return [[_selectedViewController retain] autorelease];
+    return _selectedViewController;
 }
 
 -(void)setSelectedViewController:(NSViewController<RHPreferencesViewControllerProtocol> *)new{
@@ -240,7 +238,7 @@ static const CGFloat RHPreferencesWindowControllerResizeAnimationDurationPer100P
 }
 
 -(void)setSelectedIndex:(NSUInteger)selectedIndex{
-    id newSelection = (selectedIndex >= [_viewControllers count]) ? [_viewControllers lastObject] : [_viewControllers objectAtIndex:selectedIndex];
+    id newSelection = (selectedIndex >= [_viewControllers count]) ? [_viewControllers lastObject] : _viewControllers[selectedIndex];
     [self setSelectedViewController:newSelection];
 }
 
@@ -339,13 +337,12 @@ static const CGFloat RHPreferencesWindowControllerResizeAnimationDurationPer100P
         NSToolbarItem *insertItem = [self toolbarItemWithItemIdentifier:vc.identifier];
         if (!insertItem){
             //create a new one
-            insertItem = [[self newToolbarItemForViewController:vc] autorelease];
+            insertItem = [self newToolbarItemForViewController:vc];
         }
         [newItems addObject:insertItem];
     }
     
-    [_toolbarItems release];
-    _toolbarItems = [[NSArray arrayWithArray:newItems] retain];
+    _toolbarItems = [NSArray arrayWithArray:newItems];
 }
 
 
@@ -353,7 +350,7 @@ static const CGFloat RHPreferencesWindowControllerResizeAnimationDurationPer100P
     if ([_selectedViewController commitEditing] && [[NSUserDefaultsController sharedUserDefaultsController] commitEditing]){
         NSUInteger index = [_toolbarItems indexOfObject:itemToBeSelected];
         if (index != NSNotFound){
-            [self setSelectedViewController:[_viewControllers objectAtIndex:index]];
+            [self setSelectedViewController:_viewControllers[index]];
         }
     } else {
         //set the toolbar back to the current controllers selection
@@ -407,7 +404,7 @@ static const CGFloat RHPreferencesWindowControllerResizeAnimationDurationPer100P
     
     if (_unloadedWindowTitle){
         self.window.title = _unloadedWindowTitle;
-        [_unloadedWindowTitle release]; _unloadedWindowTitle = nil;
+         _unloadedWindowTitle = nil;
     }
     
     if (_selectedViewController){
